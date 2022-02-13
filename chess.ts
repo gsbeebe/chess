@@ -1,5 +1,5 @@
-const board = [64];
-
+import {isVertical, isHorizontal, isDiagonal, isLShape} from './utility';
+import {ScreenBuffer, TextBuffer, terminal} from 'terminal-kit';
 //
 // 0   0  1  2  3  4  5  6  7 
 // 1   8  9  10 11 12 13 14 15
@@ -9,40 +9,6 @@ const board = [64];
 // 5   40 41 42 43 44 45 46 47
 // 6   48 49 50 51 52 53 54 55
 // 7   56 57 58 59 60 61 62 63
-
-const numRows = 8; 
-const numCols = 8;
-//
-function getCol(position) {
-    return position % 8;
-}
-//
-function getRow(position) {
-    return Math.floor(position / 8);
-}
-//
-function isVertical(p1, p2) {
-    return getCol(p1) === getCol(p2);
-}
-//
-function isHorizontal(p1, p2) {
-    return getRow(p1) === getRow(p2);
-}
-// To determine if one point is diagonal from another.
-function isDiagonal(pt1, pt2) {
-    if(pt1 > pt2) {
-        return pt1%pt2 === 7;
-    }
-    if(pt2 > pt1) {
-        return pt2%pt1 === 7;
-    }
-    // They are the same, which also can't happen lololol.
-    return false;
-}
-//
-function isLShape(p1, p2) {
-    return [6, 10, 15, 17].includes(Math.abs(p1-p2));
-}
 
 enum MoveType {
     VERTICAL,
@@ -72,12 +38,13 @@ enum PieceColor {
     BLACK,
 }
 
-class Piece {
+export class Piece {
     type: PieceType;
     allowedMoves: MoveType[];
     value: number;
     color: PieceColor;
     moveDistance: MoveDistance;
+    text: string;
     constructor(color: PieceColor) {
         this.color = color;
     }
@@ -88,6 +55,10 @@ class King extends Piece {
     allowedMoves = [MoveType.VERTICAL, MoveType.HORIZONTAL, MoveType.DIAGONAL];
     moveDistance: MoveDistance.ONE;
     value = 6;
+    constructor(color: PieceColor) {
+        super(color);
+        this.text = color === PieceColor.BLACK ? '♚' : '♔';
+    }
 }
 
 class Queen extends Piece {
@@ -95,6 +66,10 @@ class Queen extends Piece {
     allowedMoves = [MoveType.VERTICAL, MoveType.HORIZONTAL, MoveType.DIAGONAL];
     moveDistance: MoveDistance.UNLIMITED;
     value = 5;
+    constructor(color: PieceColor) {
+        super(color);
+        this.text = color === PieceColor.BLACK ? '♛' : '♕';
+    }
 }
 
 class Bishop extends Piece {
@@ -102,6 +77,10 @@ class Bishop extends Piece {
     allowedMoves = [MoveType.DIAGONAL];
     moveDistance: MoveDistance.UNLIMITED;
     value = 3;
+    constructor(color: PieceColor) {
+        super(color);
+        this.text = color === PieceColor.BLACK ? '♝' : '♗';
+    }
 }
 
 class Knight extends Piece {
@@ -109,6 +88,10 @@ class Knight extends Piece {
     allowedMoves = [MoveType.LSHAPE];
     moveDistance: MoveDistance.THREE;
     value = 3;
+    constructor(color: PieceColor) {
+        super(color);
+        this.text = color === PieceColor.BLACK ? '♞' : '♘';
+    }
 }
 
 class Rook extends Piece {
@@ -116,6 +99,10 @@ class Rook extends Piece {
     allowedMoves = [MoveType.VERTICAL, MoveType.HORIZONTAL];
     moveDistance: MoveDistance.UNLIMITED;
     value = 3;
+    constructor(color: PieceColor) {
+        super(color);
+        this.text = color === PieceColor.BLACK ? '♜' : '♖';
+    }
 }
 
 class Pawn extends Piece {
@@ -123,11 +110,18 @@ class Pawn extends Piece {
     allowedMoves = [MoveType.VERTICAL, MoveType.HORIZONTAL, MoveType.DIAGONAL];
     moveDistance: MoveDistance.ONE;
     value = 1;
+    constructor(color: PieceColor) {
+        super(color);
+        this.text = color === PieceColor.BLACK ? '♟︎' : '♙';
+    }
 }
 
-class Board {
-    spaces: Piece[]; // or number[][];
+export class Board {
+    turn: PieceColor;
+    spaces: Piece[];
     constructor() {
+        this.turn = PieceColor.WHITE;
+        
         const spaces = new Array(64);
         // Row 0
         spaces[0] = new Rook(PieceColor.BLACK);
@@ -169,7 +163,7 @@ class Board {
         this.spaces = spaces;
     }
 
-    isValidMove(location, destination) {
+    isValidMove(location: number, destination: number): boolean {
         // Basic check.
         if(location === destination) return false;
         // Are location and destination valid places on the board?
@@ -229,5 +223,24 @@ class Board {
                 }
             }
         }
+    }
+
+    /** Prints the current state of the spaces. */
+    print(): void {
+        const sp = this.spaces;
+        let str = '';
+        let letterCount = 0;
+        let rowCount = 8;
+        // · _
+        terminal('   a b c d e f g h  \n');
+        for(let g = 0; g < 64; g++) {
+            str += sp[g] ? ' ' + sp[g].text : ' ·';
+            if(++letterCount === 8) {
+                terminal(`${rowCount} ${str}  ${rowCount--} \n`);
+                str = '';
+                letterCount = 0;
+            }
+        }
+        terminal('   a b c d e f g h  \n');
     }
 }
