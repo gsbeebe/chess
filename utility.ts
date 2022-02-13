@@ -60,3 +60,4 @@ export function translateLocationToIndex(location: string): number {
 // test: a1; row = 1; columnIndex = 0; (7*8)+0 = 56;
 // test: h7; row = 7; columnIndex = 7; (1*8)+7 = 15;
 // test: h8; row = 8; columnIndex = 7; (0*8)+7 = 7;
+// test: a0;
