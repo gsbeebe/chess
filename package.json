@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/gsbeebe/chess#readme",
   "devDependencies": {
+    "@types/node": "^17.0.17",
     "@types/terminal-kit": "^1.28.4",
     "nodemon": "^2.0.15",
     "terminal-kit": "^2.4.0"

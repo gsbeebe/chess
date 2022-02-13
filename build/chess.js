@@ -3,15 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Board = exports.Piece = void 0;
 const utility_1 = require("./utility");
 const terminal_kit_1 = require("terminal-kit");
-//
-// 0   0  1  2  3  4  5  6  7 
-// 1   8  9  10 11 12 13 14 15
-// 2   16 17 18 19 20 21 22 23
-// 3   24 25 26 27 28 29 30 31
-// 4   32 33 34 35 36 37 38 39
-// 5   40 41 42 43 44 45 46 47
-// 6   48 49 50 51 52 53 54 55
-// 7   56 57 58 59 60 61 62 63
 var MoveType;
 (function (MoveType) {
     MoveType[MoveType["VERTICAL"] = 0] = "VERTICAL";
@@ -23,8 +14,9 @@ var MoveType;
 var MoveDistance;
 (function (MoveDistance) {
     MoveDistance[MoveDistance["ONE"] = 0] = "ONE";
-    MoveDistance[MoveDistance["THREE"] = 1] = "THREE";
-    MoveDistance[MoveDistance["UNLIMITED"] = 2] = "UNLIMITED";
+    MoveDistance[MoveDistance["ONE_OR_TWO"] = 1] = "ONE_OR_TWO";
+    MoveDistance[MoveDistance["THREE"] = 2] = "THREE";
+    MoveDistance[MoveDistance["UNLIMITED"] = 3] = "UNLIMITED";
 })(MoveDistance || (MoveDistance = {}));
 var PieceType;
 (function (PieceType) {
@@ -102,6 +94,7 @@ class Pawn extends Piece {
 }
 class Board {
     constructor() {
+        this.turn = PieceColor.WHITE;
         const spaces = new Array(64);
         // Row 0
         spaces[0] = new Rook(PieceColor.BLACK);
@@ -142,6 +135,8 @@ class Board {
         this.spaces = spaces;
     }
     isValidMove(location, destination) {
+        terminal_kit_1.terminal.red('got this far');
+        terminal_kit_1.terminal.red(`loc ${location}, dest ${destination} \n`);
         // Basic check.
         if (location === destination)
             return false;
@@ -153,6 +148,8 @@ class Board {
         if (piece === null)
             return false;
         // Does this piece belong to player?
+        if (piece.color !== this.turn)
+            return false;
         // Which direction?
         const direction = ((0, utility_1.isVertical)(location, destination) ? MoveType.VERTICAL :
             (0, utility_1.isHorizontal)(location, destination) ? MoveType.HORIZONTAL :
@@ -166,7 +163,32 @@ class Board {
         if (!piece.allowedMoves.includes(direction))
             return false;
         // Is the distance proper?
-        // ONE
+        // ONE_OR_TWO (PAWN)
+        if (piece.moveDistance === MoveDistance.ONE_OR_TWO) {
+            if (destination > location) {
+                if (direction === MoveType.VERTICAL
+                    && (destination !== location + 8
+                        && destination !== location + 16))
+                    return false;
+                // Must only be distance of 'ONE' for diagonal (attacking).
+                if (direction === MoveType.DIAGONAL
+                    && utility_1.DISTANCES_DIAGONAL.includes(destination - location))
+                    return false;
+            }
+            else if (location > destination) {
+                terminal_kit_1.terminal.red('got this far');
+                terminal_kit_1.terminal.red(`loc ${location}, dest ${destination} \n`);
+                if (direction === MoveType.VERTICAL
+                    && (destination !== location - 8
+                        && destination !== location - 16))
+                    return false;
+                // Must only be distance of 'ONE' for diagonal (attacking).
+                if (direction === MoveType.DIAGONAL
+                    && utility_1.DISTANCES_DIAGONAL.includes(location - destination))
+                    return false;
+            }
+        }
+        // ONE (PAWN, KING)
         if (piece.moveDistance === MoveDistance.ONE) {
             if (destination > location) {
                 if (direction === MoveType.VERTICAL
@@ -176,7 +198,7 @@ class Board {
                     && destination !== location + 1)
                     return false;
                 if (direction === MoveType.DIAGONAL
-                    && destination % location !== 7)
+                    && utility_1.DISTANCES_DIAGONAL.includes(destination - location))
                     return false;
             }
             else if (location > destination) {
@@ -187,7 +209,7 @@ class Board {
                     && destination !== location - 1)
                     return false;
                 if (direction === MoveType.DIAGONAL
-                    && location % destination !== 7)
+                    && utility_1.DISTANCES_DIAGONAL.includes(location - destination))
                     return false;
             }
         }
@@ -210,30 +232,63 @@ class Board {
                     if (this.spaces[toCheck] !== null) {
                         return false;
                     }
-                    // TODO: toCheck += 8;
+                    toCheck += 1;
                 }
             }
         }
+        else {
+            if (direction === MoveType.VERTICAL) {
+                let toCheck = location - 8;
+                while (destination !== toCheck && toCheck > -1) {
+                    if (this.spaces[toCheck] !== null) {
+                        return false;
+                    }
+                    toCheck -= 8;
+                }
+            }
+            else if (direction === MoveType.HORIZONTAL) {
+                let toCheck = location - 1;
+                while (destination !== toCheck && toCheck > -1) {
+                    if (this.spaces[toCheck] !== null) {
+                        return false;
+                    }
+                    toCheck -= 1;
+                }
+            }
+        }
+        // TODO: Does this move leave the player's King in check?
+        // Move is valid.
+        return true;
+    }
+    makeMove(location, destination) {
+        // Does piece exist at destination?
+        if (this.spaces[destination] !== null) {
+            // TODO: Capture piece.
+        }
+        this.spaces[destination] = this.spaces[location];
+        if (this.spaces[destination].type === PieceType.PAWN) {
+            // Just blindly reset Pawn's moveDistance to ONE every time.
+            this.spaces[destination].moveDistance = MoveDistance.ONE;
+        }
+        this.spaces[location] = null;
     }
     /** Prints the current state of the spaces. */
     print() {
-        const b = this.spaces;
-        const options = {
-            dst: terminal_kit_1.terminal,
-            width: 10,
-            height: 10,
-        };
-        const sb = new terminal_kit_1.ScreenBuffer(options);
-        const tb = new terminal_kit_1.TextBuffer({ dst: sb });
+        const sp = this.spaces;
         let str = '';
+        let letterCount = 0;
+        let rowCount = 8;
+        // · _
+        (0, terminal_kit_1.terminal)('   a b c d e f g h  \n');
         for (let g = 0; g < 64; g++) {
-            str += this.spaces[g] && this.spaces[g].text
-                ? this.spaces[g].text : '_';
-            if (g % 8 === 0) {
-                (0, terminal_kit_1.terminal)(str).insertLine(1);
+            str += sp[g] ? ' ' + sp[g].text : ' ·';
+            if (++letterCount === 8) {
+                (0, terminal_kit_1.terminal)(`${rowCount} ${str}  ${rowCount--} \n`);
                 str = '';
+                letterCount = 0;
             }
         }
+        (0, terminal_kit_1.terminal)('   a b c d e f g h  \n');
     }
 }
 exports.Board = Board;
