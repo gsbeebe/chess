@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,10 +7,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-const chess_1 = require("./chess");
-const terminal_kit_1 = require("terminal-kit");
-const utility_1 = require("./utility");
+import { Board } from './chess';
+import { terminal } from 'terminal-kit';
+import { translateLocationToIndex } from './utility';
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         let rawInput;
@@ -19,30 +17,30 @@ function main() {
         let destination;
         let arrayLocation;
         let arrayDestination;
-        const board = new chess_1.Board(true);
+        const board = new Board(true);
         board.print();
         // Main game loop.
         // TODO: Catch signals for: exit, interrupt
         while (true) {
-            terminal_kit_1.terminal.green(`It's ${board.turn}'s turn\n`);
-            terminal_kit_1.terminal('Enter your move: ');
-            rawInput = yield terminal_kit_1.terminal.inputField({}).promise;
-            terminal_kit_1.terminal('\n');
+            terminal.green(`It's ${board.turn}'s turn\n`);
+            terminal('Enter your move: ');
+            rawInput = yield terminal.inputField({}).promise;
+            terminal('\n');
             if (rawInput.toLowerCase() === 'exit')
                 break;
             location = rawInput.slice(0, 2);
             destination = rawInput.slice(3, 5);
-            arrayLocation = utility_1.translateLocationToIndex(location);
-            arrayDestination = utility_1.translateLocationToIndex(destination);
+            arrayLocation = translateLocationToIndex(location);
+            arrayDestination = translateLocationToIndex(destination);
             if (board.isValidMove(arrayLocation, arrayDestination)) {
                 board.makeMove(arrayLocation, arrayDestination);
             }
             else {
-                terminal_kit_1.terminal.red('Move is not valid: ' + rawInput + '\n');
+                terminal.red('Move is not valid: ' + rawInput + '\n');
             }
             board.print();
         }
-        terminal_kit_1.terminal.red('gg no re\n');
+        terminal.red('gg no re\n');
         process.exit();
     });
 }

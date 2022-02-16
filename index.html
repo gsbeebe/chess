@@ -2,28 +2,38 @@
   <head>
     <title>Chess</title>
     <style>
-      html { font-size: 16px; }
+      html { font-size: 20px; }
       body { 
-        background-color: #444; 
-        color: #2069e0; 
-        width: 10rem;
+        background-color: #219ebc; 
+        color: #023047; 
+        width: 16rem;
         margin: 0 auto;
         padding: 1rem;
+        font-family: monospace;
+        text-align: center;
       }
-      .alt-text { color: #082c6c; }
-      .highlight { color: #f4d47c; }
+      .alt-text { color: #8ecae6; }
+      .highlight { color: #ffb703; }
+      .warning {color: #fb8500; }
+      .small {font-size: .75rem; }
+      #invalid {visibility: hidden;}
     </style>
   </head>
   <body>
     <header>
       This is Chess
     </header>
-    <section class=".alt-text">
-      The body of this app
+
+    <section>
+      <p class="highlight">Enter your move</p>
+      <input id="input" />
+      <button id="makeMove">Play</button>
+      <p class="alt-text small">Example, without quotes: "e2 e4"</p>
+      <p id="invalid" class="warning">Invalid move!</p>
     </section>
-    <footer class=".highlight">
-      Copyright me
-    </footer>
-    <script type="text/javascript" src="/chess/build/web.js"></script>
+    <section class="board"></section>
+
+    <footer class="highlight">made by glen</footer>
+    <script type="module" src="/chess/build/web.js"></script>
   </body>
 </html>

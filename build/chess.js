@@ -1,7 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const utility_1 = require("./utility");
-const terminal_kit_1 = require("terminal-kit");
+import { isVertical, isHorizontal, isDiagonal, isLShape, DISTANCES_DIAGONAL } from './utility';
+// import { terminal } from 'terminal-kit';
 var MoveType;
 (function (MoveType) {
     MoveType["VERTICAL"] = "Vertical";
@@ -17,7 +15,7 @@ var MoveDistance;
     MoveDistance["THREE"] = "Three";
     MoveDistance["UNLIMITED"] = "Unlimited";
 })(MoveDistance || (MoveDistance = {}));
-var PieceType;
+export var PieceType;
 (function (PieceType) {
     PieceType["KING"] = "King";
     PieceType["QUEEN"] = "Queen";
@@ -25,18 +23,17 @@ var PieceType;
     PieceType["KNIGHT"] = "Knight";
     PieceType["ROOK"] = "Rook";
     PieceType["PAWN"] = "Pawn";
-})(PieceType = exports.PieceType || (exports.PieceType = {}));
-var PieceColor;
+})(PieceType || (PieceType = {}));
+export var PieceColor;
 (function (PieceColor) {
     PieceColor["WHITE"] = "White";
     PieceColor["BLACK"] = "Black";
-})(PieceColor = exports.PieceColor || (exports.PieceColor = {}));
-class Piece {
+})(PieceColor || (PieceColor = {}));
+export class Piece {
     constructor(color) {
         this.color = color;
     }
 }
-exports.Piece = Piece;
 class King extends Piece {
     constructor(color) {
         super(color);
@@ -104,7 +101,7 @@ class Pawn extends Piece {
         this.captureMoves = [MoveType.DIAGONAL];
     }
 }
-class Board {
+export class Board {
     constructor(debug = false) {
         this.debug = debug;
         this.turn = PieceColor.WHITE;
@@ -147,6 +144,7 @@ class Board {
         spaces[63] = new Rook(PieceColor.WHITE);
         this.spaces = spaces;
     }
+    getSpaces() { return this.spaces; }
     isValidMove(location, destination) {
         this.log(`location: ${location}, destination: ${destination}`);
         // Basic check.
@@ -165,10 +163,10 @@ class Board {
             return false;
         this.log(`turn: ${this.turn}, piece: ${this.turn}`);
         // Which direction?
-        const direction = (utility_1.isVertical(location, destination) ? MoveType.VERTICAL :
-            utility_1.isHorizontal(location, destination) ? MoveType.HORIZONTAL :
-                utility_1.isDiagonal(location, destination) ? MoveType.DIAGONAL :
-                    utility_1.isLShape(location, destination) ? MoveType.LSHAPE :
+        const direction = (isVertical(location, destination) ? MoveType.VERTICAL :
+            isHorizontal(location, destination) ? MoveType.HORIZONTAL :
+                isDiagonal(location, destination) ? MoveType.DIAGONAL :
+                    isLShape(location, destination) ? MoveType.LSHAPE :
                         null);
         this.log(`direction: ${direction}`);
         // Is direction null?
@@ -187,7 +185,7 @@ class Board {
                     return false;
                 // Must only be distance of 'ONE' for diagonal (attacking).
                 if (direction === MoveType.DIAGONAL
-                    && utility_1.DISTANCES_DIAGONAL.includes(destination - location))
+                    && DISTANCES_DIAGONAL.includes(destination - location))
                     return false;
             }
             else if (location > destination) {
@@ -197,7 +195,7 @@ class Board {
                     return false;
                 // Must only be distance of 'ONE' for diagonal (attacking).
                 if (direction === MoveType.DIAGONAL
-                    && utility_1.DISTANCES_DIAGONAL.includes(location - destination))
+                    && DISTANCES_DIAGONAL.includes(location - destination))
                     return false;
             }
         }
@@ -211,7 +209,7 @@ class Board {
                     && destination !== location + 1)
                     return false;
                 if (direction === MoveType.DIAGONAL
-                    && utility_1.DISTANCES_DIAGONAL.includes(destination - location))
+                    && DISTANCES_DIAGONAL.includes(destination - location))
                     return false;
             }
             else if (location > destination) {
@@ -222,7 +220,7 @@ class Board {
                     && destination !== location - 1)
                     return false;
                 if (direction === MoveType.DIAGONAL
-                    && utility_1.DISTANCES_DIAGONAL.includes(location - destination))
+                    && DISTANCES_DIAGONAL.includes(location - destination))
                     return false;
             }
         }
@@ -310,26 +308,44 @@ class Board {
         let letterCount = 0;
         let rowCount = 8;
         // · _
-        terminal_kit_1.terminal('   a b c d e f g h  \n');
+        // terminal('   a b c d e f g h  \n');
         for (let g = 0; g < 64; g++) {
             str += sp[g] ? ' ' + sp[g].text : ' ·';
             if (++letterCount === 8) {
-                terminal_kit_1.terminal(`${rowCount} ${str}  ${rowCount--} \n`);
+                // terminal(`${rowCount} ${str}  ${rowCount--} \n`);
                 str = '';
                 letterCount = 0;
             }
         }
-        terminal_kit_1.terminal('   a b c d e f g h  \n');
+        // terminal('   a b c d e f g h  \n');
+    }
+    formatBoard() {
+        const sp = this.spaces;
+        let str = ``;
+        let letterCount = 0;
+        let rowCount = 8;
+        // · _
+        str += `   a b c d e f g h  \n`;
+        let temp = ``;
+        for (let g = 0; g < 64; g++) {
+            temp += sp[g] ? ' ' + sp[g].text : ' ·';
+            if (++letterCount === 8) {
+                str += `${rowCount} ${temp}  ${rowCount--} \n`;
+                temp = '';
+                letterCount = 0;
+            }
+        }
+        str += `   a b c d e f g h  \n`;
+        return str;
     }
     log(str) {
         if (this.debug) {
-            terminal_kit_1.terminal.yellow(str + '\n');
+            // terminal.yellow(str + '\n');
         }
     }
     error(str) {
         if (this.debug) {
-            terminal_kit_1.terminal.red(str + '\n');
+            // terminal.red(str + '\n');
         }
     }
 }
-exports.Board = Board;

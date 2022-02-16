@@ -1,5 +1,5 @@
 import { isVertical, isHorizontal, isDiagonal, isLShape, DISTANCES_DIAGONAL } from './utility';
-import { terminal } from 'terminal-kit';
+// import { terminal } from 'terminal-kit';
 
 enum MoveType {
     VERTICAL = 'Vertical',
@@ -118,7 +118,7 @@ class Pawn extends Piece {
 
 export class Board {
     turn: PieceColor;
-    spaces: Piece[];
+    private spaces: Piece[];
     debug: boolean;
     constructor(debug: boolean = false) {
         this.debug = debug;
@@ -164,6 +164,8 @@ export class Board {
 
         this.spaces = spaces;
     }
+
+    getSpaces(): Piece[] { return this.spaces; }
 
     isValidMove(location: number, destination: number): boolean {
         this.log(`location: ${location}, destination: ${destination}`);
@@ -315,26 +317,46 @@ export class Board {
         let letterCount = 0;
         let rowCount = 8;
         // · _
-        terminal('   a b c d e f g h  \n');
+        // terminal('   a b c d e f g h  \n');
         for (let g = 0; g < 64; g++) {
             str += sp[g] ? ' ' + sp[g].text : ' ·';
             if (++letterCount === 8) {
-                terminal(`${rowCount} ${str}  ${rowCount--} \n`);
+                // terminal(`${rowCount} ${str}  ${rowCount--} \n`);
                 str = '';
                 letterCount = 0;
             }
         }
-        terminal('   a b c d e f g h  \n');
+        // terminal('   a b c d e f g h  \n');
+    }
+
+    formatBoard(): string {
+        const sp = this.spaces;
+        let str = ``;
+        let letterCount = 0;
+        let rowCount = 8;
+        // · _
+        str += `   a b c d e f g h  \n`;
+        let temp = ``;
+        for (let g = 0; g < 64; g++) {
+            temp += sp[g] ? ' ' + sp[g].text : ' ·';
+            if (++letterCount === 8) {
+                str += `${rowCount} ${temp}  ${rowCount--} \n`;
+                temp = '';
+                letterCount = 0;
+            }
+        }
+        str += `   a b c d e f g h  \n`;
+        return str;
     }
 
     private log(str: string): void {
         if (this.debug) {
-            terminal.yellow(str + '\n');
+            // terminal.yellow(str + '\n');
         }
     }
     private error(str: string): void {
         if (this.debug) {
-            terminal.red(str + '\n');
+            // terminal.red(str + '\n');
         }
     }
 }
