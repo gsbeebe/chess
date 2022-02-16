@@ -1,37 +1,36 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Board = exports.Piece = void 0;
 const utility_1 = require("./utility");
 const terminal_kit_1 = require("terminal-kit");
 var MoveType;
 (function (MoveType) {
-    MoveType[MoveType["VERTICAL"] = 0] = "VERTICAL";
-    MoveType[MoveType["HORIZONTAL"] = 1] = "HORIZONTAL";
-    MoveType[MoveType["DIAGONAL"] = 2] = "DIAGONAL";
-    MoveType[MoveType["LSHAPE"] = 3] = "LSHAPE";
-    MoveType[MoveType["EN_PASSANT"] = 4] = "EN_PASSANT";
+    MoveType["VERTICAL"] = "Vertical";
+    MoveType["HORIZONTAL"] = "Horizontal";
+    MoveType["DIAGONAL"] = "Diagonal";
+    MoveType["LSHAPE"] = "LShape";
+    MoveType["EN_PASSANT"] = "EnPassant";
 })(MoveType || (MoveType = {}));
 var MoveDistance;
 (function (MoveDistance) {
-    MoveDistance[MoveDistance["ONE"] = 0] = "ONE";
-    MoveDistance[MoveDistance["ONE_OR_TWO"] = 1] = "ONE_OR_TWO";
-    MoveDistance[MoveDistance["THREE"] = 2] = "THREE";
-    MoveDistance[MoveDistance["UNLIMITED"] = 3] = "UNLIMITED";
+    MoveDistance["ONE"] = "One";
+    MoveDistance["ONE_OR_TWO"] = "OneOrTwo";
+    MoveDistance["THREE"] = "Three";
+    MoveDistance["UNLIMITED"] = "Unlimited";
 })(MoveDistance || (MoveDistance = {}));
 var PieceType;
 (function (PieceType) {
-    PieceType[PieceType["KING"] = 0] = "KING";
-    PieceType[PieceType["QUEEN"] = 1] = "QUEEN";
-    PieceType[PieceType["BISHOP"] = 2] = "BISHOP";
-    PieceType[PieceType["KNIGHT"] = 3] = "KNIGHT";
-    PieceType[PieceType["ROOK"] = 4] = "ROOK";
-    PieceType[PieceType["PAWN"] = 5] = "PAWN";
-})(PieceType || (PieceType = {}));
+    PieceType["KING"] = "King";
+    PieceType["QUEEN"] = "Queen";
+    PieceType["BISHOP"] = "Bishop";
+    PieceType["KNIGHT"] = "Knight";
+    PieceType["ROOK"] = "Rook";
+    PieceType["PAWN"] = "Pawn";
+})(PieceType = exports.PieceType || (exports.PieceType = {}));
 var PieceColor;
 (function (PieceColor) {
-    PieceColor[PieceColor["WHITE"] = 0] = "WHITE";
-    PieceColor[PieceColor["BLACK"] = 1] = "BLACK";
-})(PieceColor || (PieceColor = {}));
+    PieceColor["WHITE"] = "White";
+    PieceColor["BLACK"] = "Black";
+})(PieceColor = exports.PieceColor || (exports.PieceColor = {}));
 class Piece {
     constructor(color) {
         this.color = color;
@@ -43,8 +42,10 @@ class King extends Piece {
         super(color);
         this.type = PieceType.KING;
         this.allowedMoves = [MoveType.VERTICAL, MoveType.HORIZONTAL, MoveType.DIAGONAL];
+        this.moveDistance = MoveDistance.ONE;
         this.value = 6;
         this.text = color === PieceColor.BLACK ? '♚' : '♔';
+        this.captureMoves = this.allowedMoves;
     }
 }
 class Queen extends Piece {
@@ -52,8 +53,10 @@ class Queen extends Piece {
         super(color);
         this.type = PieceType.QUEEN;
         this.allowedMoves = [MoveType.VERTICAL, MoveType.HORIZONTAL, MoveType.DIAGONAL];
+        this.moveDistance = MoveDistance.UNLIMITED;
         this.value = 5;
         this.text = color === PieceColor.BLACK ? '♛' : '♕';
+        this.captureMoves = this.allowedMoves;
     }
 }
 class Bishop extends Piece {
@@ -61,8 +64,10 @@ class Bishop extends Piece {
         super(color);
         this.type = PieceType.BISHOP;
         this.allowedMoves = [MoveType.DIAGONAL];
+        this.moveDistance = MoveDistance.UNLIMITED;
         this.value = 3;
         this.text = color === PieceColor.BLACK ? '♝' : '♗';
+        this.captureMoves = this.allowedMoves;
     }
 }
 class Knight extends Piece {
@@ -70,8 +75,10 @@ class Knight extends Piece {
         super(color);
         this.type = PieceType.KNIGHT;
         this.allowedMoves = [MoveType.LSHAPE];
+        this.moveDistance = MoveDistance.THREE;
         this.value = 3;
         this.text = color === PieceColor.BLACK ? '♞' : '♘';
+        this.captureMoves = this.allowedMoves;
     }
 }
 class Rook extends Piece {
@@ -79,8 +86,10 @@ class Rook extends Piece {
         super(color);
         this.type = PieceType.ROOK;
         this.allowedMoves = [MoveType.VERTICAL, MoveType.HORIZONTAL];
+        this.moveDistance = MoveDistance.UNLIMITED;
         this.value = 3;
         this.text = color === PieceColor.BLACK ? '♜' : '♖';
+        this.captureMoves = this.allowedMoves;
     }
 }
 class Pawn extends Piece {
@@ -88,12 +97,16 @@ class Pawn extends Piece {
         super(color);
         this.type = PieceType.PAWN;
         this.allowedMoves = [MoveType.VERTICAL, MoveType.HORIZONTAL, MoveType.DIAGONAL];
+        /** ONE_OR_TWO to start, then ONE after initial move. */
+        this.moveDistance = MoveDistance.ONE_OR_TWO;
         this.value = 1;
         this.text = color === PieceColor.BLACK ? '♟︎' : '♙';
+        this.captureMoves = [MoveType.DIAGONAL];
     }
 }
 class Board {
-    constructor() {
+    constructor(debug = false) {
+        this.debug = debug;
         this.turn = PieceColor.WHITE;
         const spaces = new Array(64);
         // Row 0
@@ -135,8 +148,7 @@ class Board {
         this.spaces = spaces;
     }
     isValidMove(location, destination) {
-        terminal_kit_1.terminal.red('got this far');
-        terminal_kit_1.terminal.red(`loc ${location}, dest ${destination} \n`);
+        this.log(`location: ${location}, destination: ${destination}`);
         // Basic check.
         if (location === destination)
             return false;
@@ -147,15 +159,18 @@ class Board {
         const piece = this.spaces[location] || null;
         if (piece === null)
             return false;
+        this.log(JSON.stringify(piece));
         // Does this piece belong to player?
         if (piece.color !== this.turn)
             return false;
+        this.log(`turn: ${this.turn}, piece: ${this.turn}`);
         // Which direction?
-        const direction = ((0, utility_1.isVertical)(location, destination) ? MoveType.VERTICAL :
-            (0, utility_1.isHorizontal)(location, destination) ? MoveType.HORIZONTAL :
-                (0, utility_1.isDiagonal)(location, destination) ? MoveType.DIAGONAL :
-                    (0, utility_1.isLShape)(location, destination) ? MoveType.LSHAPE :
+        const direction = (utility_1.isVertical(location, destination) ? MoveType.VERTICAL :
+            utility_1.isHorizontal(location, destination) ? MoveType.HORIZONTAL :
+                utility_1.isDiagonal(location, destination) ? MoveType.DIAGONAL :
+                    utility_1.isLShape(location, destination) ? MoveType.LSHAPE :
                         null);
+        this.log(`direction: ${direction}`);
         // Is direction null?
         if (direction === null)
             return false;
@@ -176,11 +191,9 @@ class Board {
                     return false;
             }
             else if (location > destination) {
-                terminal_kit_1.terminal.red('got this far');
-                terminal_kit_1.terminal.red(`loc ${location}, dest ${destination} \n`);
                 if (direction === MoveType.VERTICAL
-                    && (destination !== location - 8
-                        && destination !== location - 16))
+                    && destination !== location - 8
+                    && destination !== location - 16)
                     return false;
                 // Must only be distance of 'ONE' for diagonal (attacking).
                 if (direction === MoveType.DIAGONAL
@@ -216,11 +229,12 @@ class Board {
         // UNLIMITED
         // THREE
         // Are there any pieces in the way?
+        // TODO: Check diagonal distances.
         if (destination > location) {
             if (direction === MoveType.VERTICAL) {
                 let toCheck = location + 8;
                 while (destination !== toCheck && toCheck < 64) {
-                    if (this.spaces[toCheck] !== null) {
+                    if (this.spaces[toCheck] !== undefined) {
                         return false;
                     }
                     toCheck += 8;
@@ -229,18 +243,21 @@ class Board {
             else if (direction === MoveType.HORIZONTAL) {
                 let toCheck = location + 1;
                 while (destination !== toCheck && toCheck < 64) {
-                    if (this.spaces[toCheck] !== null) {
+                    if (this.spaces[toCheck] !== undefined) {
                         return false;
                     }
                     toCheck += 1;
                 }
+            }
+            else if (direction === MoveType.DIAGONAL) {
+                // TODO - two 'directions'
             }
         }
         else {
             if (direction === MoveType.VERTICAL) {
                 let toCheck = location - 8;
                 while (destination !== toCheck && toCheck > -1) {
-                    if (this.spaces[toCheck] !== null) {
+                    if (this.spaces[toCheck] !== undefined) {
                         return false;
                     }
                     toCheck -= 8;
@@ -249,20 +266,31 @@ class Board {
             else if (direction === MoveType.HORIZONTAL) {
                 let toCheck = location - 1;
                 while (destination !== toCheck && toCheck > -1) {
-                    if (this.spaces[toCheck] !== null) {
+                    if (this.spaces[toCheck] !== undefined) {
                         return false;
                     }
                     toCheck -= 1;
                 }
             }
+            else if (direction === MoveType.DIAGONAL) {
+                // TODO - two 'directions'
+            }
         }
+        // Is piece capturing another piece, and is this allowed?
+        // Really just for sneaky Pawns who are trying to capture Vertically.
+        if (this.spaces[destination] !== undefined
+            && !piece.captureMoves.includes(direction)) {
+            this.error('Piece cannot capture that direction');
+            return false;
+        }
+        this.log('Valid move');
         // TODO: Does this move leave the player's King in check?
         // Move is valid.
         return true;
     }
     makeMove(location, destination) {
         // Does piece exist at destination?
-        if (this.spaces[destination] !== null) {
+        if (this.spaces[destination] !== undefined) {
             // TODO: Capture piece.
         }
         this.spaces[destination] = this.spaces[location];
@@ -270,7 +298,10 @@ class Board {
             // Just blindly reset Pawn's moveDistance to ONE every time.
             this.spaces[destination].moveDistance = MoveDistance.ONE;
         }
-        this.spaces[location] = null;
+        this.spaces[location] = undefined;
+        this.turn =
+            this.turn === PieceColor.WHITE
+                ? PieceColor.BLACK : PieceColor.WHITE;
     }
     /** Prints the current state of the spaces. */
     print() {
@@ -279,16 +310,26 @@ class Board {
         let letterCount = 0;
         let rowCount = 8;
         // · _
-        (0, terminal_kit_1.terminal)('   a b c d e f g h  \n');
+        terminal_kit_1.terminal('   a b c d e f g h  \n');
         for (let g = 0; g < 64; g++) {
             str += sp[g] ? ' ' + sp[g].text : ' ·';
             if (++letterCount === 8) {
-                (0, terminal_kit_1.terminal)(`${rowCount} ${str}  ${rowCount--} \n`);
+                terminal_kit_1.terminal(`${rowCount} ${str}  ${rowCount--} \n`);
                 str = '';
                 letterCount = 0;
             }
         }
-        (0, terminal_kit_1.terminal)('   a b c d e f g h  \n');
+        terminal_kit_1.terminal('   a b c d e f g h  \n');
+    }
+    log(str) {
+        if (this.debug) {
+            terminal_kit_1.terminal.yellow(str + '\n');
+        }
+    }
+    error(str) {
+        if (this.debug) {
+            terminal_kit_1.terminal.red(str + '\n');
+        }
     }
 }
 exports.Board = Board;
