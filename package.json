@@ -16,7 +16,7 @@
   "bugs": {
     "url": "https://github.com/gsbeebe/chess/issues"
   },
-  "homepage": "http://gsbeebe.github.io/chess",
+  "homepage": "https://gsbeebe.github.io/chess",
   "devDependencies": {
     "@types/node": "^17.0.17",
     "@types/terminal-kit": "^1.28.4",
