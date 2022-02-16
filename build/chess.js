@@ -1,3 +1,18 @@
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 import { isVertical, isHorizontal, isDiagonal, isLShape, DISTANCES_DIAGONAL } from './utility';
 // import { terminal } from 'terminal-kit';
 var MoveType;
@@ -29,83 +44,104 @@ export var PieceColor;
     PieceColor["WHITE"] = "White";
     PieceColor["BLACK"] = "Black";
 })(PieceColor || (PieceColor = {}));
-export class Piece {
-    constructor(color) {
+var Piece = /** @class */ (function () {
+    function Piece(color) {
         this.color = color;
     }
-}
-class King extends Piece {
-    constructor(color) {
-        super(color);
-        this.type = PieceType.KING;
-        this.allowedMoves = [MoveType.VERTICAL, MoveType.HORIZONTAL, MoveType.DIAGONAL];
-        this.moveDistance = MoveDistance.ONE;
-        this.value = 6;
-        this.text = color === PieceColor.BLACK ? '♚' : '♔';
-        this.captureMoves = this.allowedMoves;
+    return Piece;
+}());
+export { Piece };
+var King = /** @class */ (function (_super) {
+    __extends(King, _super);
+    function King(color) {
+        var _this = _super.call(this, color) || this;
+        _this.type = PieceType.KING;
+        _this.allowedMoves = [MoveType.VERTICAL, MoveType.HORIZONTAL, MoveType.DIAGONAL];
+        _this.moveDistance = MoveDistance.ONE;
+        _this.value = 6;
+        _this.text = color === PieceColor.BLACK ? '♚' : '♔';
+        _this.captureMoves = _this.allowedMoves;
+        return _this;
     }
-}
-class Queen extends Piece {
-    constructor(color) {
-        super(color);
-        this.type = PieceType.QUEEN;
-        this.allowedMoves = [MoveType.VERTICAL, MoveType.HORIZONTAL, MoveType.DIAGONAL];
-        this.moveDistance = MoveDistance.UNLIMITED;
-        this.value = 5;
-        this.text = color === PieceColor.BLACK ? '♛' : '♕';
-        this.captureMoves = this.allowedMoves;
+    return King;
+}(Piece));
+var Queen = /** @class */ (function (_super) {
+    __extends(Queen, _super);
+    function Queen(color) {
+        var _this = _super.call(this, color) || this;
+        _this.type = PieceType.QUEEN;
+        _this.allowedMoves = [MoveType.VERTICAL, MoveType.HORIZONTAL, MoveType.DIAGONAL];
+        _this.moveDistance = MoveDistance.UNLIMITED;
+        _this.value = 5;
+        _this.text = color === PieceColor.BLACK ? '♛' : '♕';
+        _this.captureMoves = _this.allowedMoves;
+        return _this;
     }
-}
-class Bishop extends Piece {
-    constructor(color) {
-        super(color);
-        this.type = PieceType.BISHOP;
-        this.allowedMoves = [MoveType.DIAGONAL];
-        this.moveDistance = MoveDistance.UNLIMITED;
-        this.value = 3;
-        this.text = color === PieceColor.BLACK ? '♝' : '♗';
-        this.captureMoves = this.allowedMoves;
+    return Queen;
+}(Piece));
+var Bishop = /** @class */ (function (_super) {
+    __extends(Bishop, _super);
+    function Bishop(color) {
+        var _this = _super.call(this, color) || this;
+        _this.type = PieceType.BISHOP;
+        _this.allowedMoves = [MoveType.DIAGONAL];
+        _this.moveDistance = MoveDistance.UNLIMITED;
+        _this.value = 3;
+        _this.text = color === PieceColor.BLACK ? '♝' : '♗';
+        _this.captureMoves = _this.allowedMoves;
+        return _this;
     }
-}
-class Knight extends Piece {
-    constructor(color) {
-        super(color);
-        this.type = PieceType.KNIGHT;
-        this.allowedMoves = [MoveType.LSHAPE];
-        this.moveDistance = MoveDistance.THREE;
-        this.value = 3;
-        this.text = color === PieceColor.BLACK ? '♞' : '♘';
-        this.captureMoves = this.allowedMoves;
+    return Bishop;
+}(Piece));
+var Knight = /** @class */ (function (_super) {
+    __extends(Knight, _super);
+    function Knight(color) {
+        var _this = _super.call(this, color) || this;
+        _this.type = PieceType.KNIGHT;
+        _this.allowedMoves = [MoveType.LSHAPE];
+        _this.moveDistance = MoveDistance.THREE;
+        _this.value = 3;
+        _this.text = color === PieceColor.BLACK ? '♞' : '♘';
+        _this.captureMoves = _this.allowedMoves;
+        return _this;
     }
-}
-class Rook extends Piece {
-    constructor(color) {
-        super(color);
-        this.type = PieceType.ROOK;
-        this.allowedMoves = [MoveType.VERTICAL, MoveType.HORIZONTAL];
-        this.moveDistance = MoveDistance.UNLIMITED;
-        this.value = 3;
-        this.text = color === PieceColor.BLACK ? '♜' : '♖';
-        this.captureMoves = this.allowedMoves;
+    return Knight;
+}(Piece));
+var Rook = /** @class */ (function (_super) {
+    __extends(Rook, _super);
+    function Rook(color) {
+        var _this = _super.call(this, color) || this;
+        _this.type = PieceType.ROOK;
+        _this.allowedMoves = [MoveType.VERTICAL, MoveType.HORIZONTAL];
+        _this.moveDistance = MoveDistance.UNLIMITED;
+        _this.value = 3;
+        _this.text = color === PieceColor.BLACK ? '♜' : '♖';
+        _this.captureMoves = _this.allowedMoves;
+        return _this;
     }
-}
-class Pawn extends Piece {
-    constructor(color) {
-        super(color);
-        this.type = PieceType.PAWN;
-        this.allowedMoves = [MoveType.VERTICAL, MoveType.HORIZONTAL, MoveType.DIAGONAL];
+    return Rook;
+}(Piece));
+var Pawn = /** @class */ (function (_super) {
+    __extends(Pawn, _super);
+    function Pawn(color) {
+        var _this = _super.call(this, color) || this;
+        _this.type = PieceType.PAWN;
+        _this.allowedMoves = [MoveType.VERTICAL, MoveType.HORIZONTAL, MoveType.DIAGONAL];
         /** ONE_OR_TWO to start, then ONE after initial move. */
-        this.moveDistance = MoveDistance.ONE_OR_TWO;
-        this.value = 1;
-        this.text = color === PieceColor.BLACK ? '♟︎' : '♙';
-        this.captureMoves = [MoveType.DIAGONAL];
+        _this.moveDistance = MoveDistance.ONE_OR_TWO;
+        _this.value = 1;
+        _this.text = color === PieceColor.BLACK ? '♟︎' : '♙';
+        _this.captureMoves = [MoveType.DIAGONAL];
+        return _this;
     }
-}
-export class Board {
-    constructor(debug = false) {
+    return Pawn;
+}(Piece));
+var Board = /** @class */ (function () {
+    function Board(debug) {
+        if (debug === void 0) { debug = false; }
         this.debug = debug;
         this.turn = PieceColor.WHITE;
-        const spaces = new Array(64);
+        var spaces = new Array(64);
         // Row 0
         spaces[0] = new Rook(PieceColor.BLACK);
         spaces[1] = new Knight(PieceColor.BLACK);
@@ -144,9 +180,9 @@ export class Board {
         spaces[63] = new Rook(PieceColor.WHITE);
         this.spaces = spaces;
     }
-    getSpaces() { return this.spaces; }
-    isValidMove(location, destination) {
-        this.log(`location: ${location}, destination: ${destination}`);
+    Board.prototype.getSpaces = function () { return this.spaces; };
+    Board.prototype.isValidMove = function (location, destination) {
+        this.log("location: ".concat(location, ", destination: ").concat(destination));
         // Basic check.
         if (location === destination)
             return false;
@@ -154,21 +190,21 @@ export class Board {
         if (location < 0 || location > 63 || destination < 0 || destination > 63)
             return false;
         // Does a piece exist at location?
-        const piece = this.spaces[location] || null;
+        var piece = this.spaces[location] || null;
         if (piece === null)
             return false;
         this.log(JSON.stringify(piece));
         // Does this piece belong to player?
         if (piece.color !== this.turn)
             return false;
-        this.log(`turn: ${this.turn}, piece: ${this.turn}`);
+        this.log("turn: ".concat(this.turn, ", piece: ").concat(this.turn));
         // Which direction?
-        const direction = (isVertical(location, destination) ? MoveType.VERTICAL :
+        var direction = (isVertical(location, destination) ? MoveType.VERTICAL :
             isHorizontal(location, destination) ? MoveType.HORIZONTAL :
                 isDiagonal(location, destination) ? MoveType.DIAGONAL :
                     isLShape(location, destination) ? MoveType.LSHAPE :
                         null);
-        this.log(`direction: ${direction}`);
+        this.log("direction: ".concat(direction));
         // Is direction null?
         if (direction === null)
             return false;
@@ -230,7 +266,7 @@ export class Board {
         // TODO: Check diagonal distances.
         if (destination > location) {
             if (direction === MoveType.VERTICAL) {
-                let toCheck = location + 8;
+                var toCheck = location + 8;
                 while (destination !== toCheck && toCheck < 64) {
                     if (this.spaces[toCheck] !== undefined) {
                         return false;
@@ -239,7 +275,7 @@ export class Board {
                 }
             }
             else if (direction === MoveType.HORIZONTAL) {
-                let toCheck = location + 1;
+                var toCheck = location + 1;
                 while (destination !== toCheck && toCheck < 64) {
                     if (this.spaces[toCheck] !== undefined) {
                         return false;
@@ -253,7 +289,7 @@ export class Board {
         }
         else {
             if (direction === MoveType.VERTICAL) {
-                let toCheck = location - 8;
+                var toCheck = location - 8;
                 while (destination !== toCheck && toCheck > -1) {
                     if (this.spaces[toCheck] !== undefined) {
                         return false;
@@ -262,7 +298,7 @@ export class Board {
                 }
             }
             else if (direction === MoveType.HORIZONTAL) {
-                let toCheck = location - 1;
+                var toCheck = location - 1;
                 while (destination !== toCheck && toCheck > -1) {
                     if (this.spaces[toCheck] !== undefined) {
                         return false;
@@ -285,8 +321,8 @@ export class Board {
         // TODO: Does this move leave the player's King in check?
         // Move is valid.
         return true;
-    }
-    makeMove(location, destination) {
+    };
+    Board.prototype.makeMove = function (location, destination) {
         // Does piece exist at destination?
         if (this.spaces[destination] !== undefined) {
             // TODO: Capture piece.
@@ -300,16 +336,16 @@ export class Board {
         this.turn =
             this.turn === PieceColor.WHITE
                 ? PieceColor.BLACK : PieceColor.WHITE;
-    }
+    };
     /** Prints the current state of the spaces. */
-    print() {
-        const sp = this.spaces;
-        let str = '';
-        let letterCount = 0;
-        let rowCount = 8;
+    Board.prototype.print = function () {
+        var sp = this.spaces;
+        var str = '';
+        var letterCount = 0;
+        var rowCount = 8;
         // · _
         // terminal('   a b c d e f g h  \n');
-        for (let g = 0; g < 64; g++) {
+        for (var g = 0; g < 64; g++) {
             str += sp[g] ? ' ' + sp[g].text : ' ·';
             if (++letterCount === 8) {
                 // terminal(`${rowCount} ${str}  ${rowCount--} \n`);
@@ -318,34 +354,36 @@ export class Board {
             }
         }
         // terminal('   a b c d e f g h  \n');
-    }
-    formatBoard() {
-        const sp = this.spaces;
-        let str = ``;
-        let letterCount = 0;
-        let rowCount = 8;
+    };
+    Board.prototype.formatBoard = function () {
+        var sp = this.spaces;
+        var str = "";
+        var letterCount = 0;
+        var rowCount = 8;
         // · _
-        str += `   a b c d e f g h  \n`;
-        let temp = ``;
-        for (let g = 0; g < 64; g++) {
+        str += "   a b c d e f g h  \n";
+        var temp = "";
+        for (var g = 0; g < 64; g++) {
             temp += sp[g] ? ' ' + sp[g].text : ' ·';
             if (++letterCount === 8) {
-                str += `${rowCount} ${temp}  ${rowCount--} \n`;
+                str += "".concat(rowCount, " ").concat(temp, "  ").concat(rowCount--, " \n");
                 temp = '';
                 letterCount = 0;
             }
         }
-        str += `   a b c d e f g h  \n`;
+        str += "   a b c d e f g h  \n";
         return str;
-    }
-    log(str) {
+    };
+    Board.prototype.log = function (str) {
         if (this.debug) {
             // terminal.yellow(str + '\n');
         }
-    }
-    error(str) {
+    };
+    Board.prototype.error = function (str) {
         if (this.debug) {
             // terminal.red(str + '\n');
         }
-    }
-}
+    };
+    return Board;
+}());
+export { Board };

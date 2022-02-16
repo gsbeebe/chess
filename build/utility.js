@@ -1,9 +1,9 @@
 // Constants
-export const NUM_COLUMNS = 8;
-export const NUM_ROWS = 8;
-export const NUM_SPACES = 64;
-export const DISTANCES_DIAGONAL = [7, 9];
-const DISTANCES_L = [6, 10, 15, 17];
+export var NUM_COLUMNS = 8;
+export var NUM_ROWS = 8;
+export var NUM_SPACES = 64;
+export var DISTANCES_DIAGONAL = [7, 9];
+var DISTANCES_L = [6, 10, 15, 17];
 // Functions
 /** Get the column of any given point. */
 export function getColumn(position) {
@@ -23,8 +23,8 @@ export function isHorizontal(location, destination) {
 }
 /** Determine if the destination is diagonal from the location. */
 export function isDiagonal(location, destination) {
-    const diff = Math.abs(destination - location);
-    console.log(`diff ${diff} diff mod 7 ${diff % 7} diff mod 9 ${diff % 9}`);
+    var diff = Math.abs(destination - location);
+    console.log("diff ".concat(diff, " diff mod 7 ").concat(diff % 7, " diff mod 9 ").concat(diff % 9));
     return diff % 7 === 0 || diff % 9 === 0;
     // return DISTANCES_DIAGONAL.includes(modulo);
 }
@@ -33,23 +33,23 @@ export function isLShape(location, destination) {
     return DISTANCES_L.includes(Math.abs(location - destination));
 }
 /** Constants for translating location to array index. */
-const columnLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-const rowNumbers = [1, 2, 3, 4, 5, 6, 7, 8];
-const rowToArrRow = { 8: 0, 7: 1, 6: 2, 5: 3, 4: 4, 3: 5, 2: 6, 1: 7 };
+var columnLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+var rowNumbers = [1, 2, 3, 4, 5, 6, 7, 8];
+var rowToArrRow = { 8: 0, 7: 1, 6: 2, 5: 3, 4: 4, 3: 5, 2: 6, 1: 7 };
 /** Translate board location to array location. */
 export function translateLocationToIndex(location) {
     // Ensure length is exactly 2.
     if (location.length !== 2)
         return -1;
-    const column = location[0].toLowerCase();
-    const row = Number(location[1]);
+    var column = location[0].toLowerCase();
+    var row = Number(location[1]);
     // Ensure column is a value within allowed letters.
     if (!columnLetters.includes(column))
         return -1;
     // Ensure row is a value within allowed numbers.
     if (!rowNumbers.includes(row))
         return -1;
-    const columnIndex = columnLetters.indexOf(column);
+    var columnIndex = columnLetters.indexOf(column);
     // Quick mafs to figure out array index.
     return (rowToArrRow[row] * NUM_ROWS) + columnIndex;
 }
