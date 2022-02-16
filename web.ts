@@ -1,11 +1,12 @@
-import { Board, Piece } from "./chess";
-import { translateLocationToIndex } from "./utility";
-
+// const { Board, Piece } = require('build/chess');
+// const { translateLocationToIndex } = require('./build/utility');
+import {Board, Piece} from './build/chess';
+import {translateLocationToIndex} from './build/utility';
 (() => {
     /* ... */
     console.log('dis worked');
 })();
-let board: Board;
+let board;
 function main() {
     board = new Board(true);
     printBoard();
@@ -43,7 +44,7 @@ function makeMove() {
 }
 
 function printBoard() {
-    const s: Piece[] = board.getSpaces();
+    const s = board.getSpaces();
     let html = `<section class="board">`;
     html += `<h3>It's ${board.turn}'s turn</h3>`;
     html += `<p>a b c d e f g h</p>`;

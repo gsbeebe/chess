@@ -554,7 +554,7 @@ define("main", ["require", "exports", "chess", "terminal-kit", "utility"], funct
 // 6:2   48 49 50 51 52 53 54 55  2
 // 7:1   56 57 58 59 60 61 62 63  1
 //       a  b  c  d  e  f  g  h
-define("web", ["require", "exports", "chess", "utility"], function (require, exports, chess_2, utility_3) {
+define("web", ["require", "exports", "./build/chess", "./build/utility"], function (require, exports, chess_2, utility_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     (function () {
