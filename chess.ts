@@ -7,6 +7,7 @@ enum MoveType {
     DIAGONAL = 'Diagonal',
     LSHAPE = 'LShape',
     EN_PASSANT = 'EnPassant',
+    CASTLE = 'Castle',
 }
 
 enum MoveDistance {
