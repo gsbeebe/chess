@@ -1,7 +1,7 @@
 // const { Board, Piece } = require('build/chess');
 // const { translateLocationToIndex } = require('./build/utility');
-import {Board, Piece} from './build/chess';
-import {translateLocationToIndex} from './build/utility';
+import {Board, Piece} from './chess';
+import {translateLocationToIndex} from './utility';
 (() => {
     /* ... */
     console.log('dis worked');
