@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+      "module": "CommonJS",
+      "experimentalDecorators": true,
+      "target": "ESNext",
+      "outDir": "./build",
+      "sourceMap": true,
+      "watch": false,
+      "plugins": [
+        { "name": "typescript-tslint-plugin" }
+      ]
+    }
+}

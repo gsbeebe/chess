@@ -1,0 +1,11 @@
+runtime: nodejs16
+
+handlers:
+- url: /.*
+  secure: always
+  redirect_http_response_code: 301
+  script: auto
+
+env_variables:
+  SESSION_SECRET: "secret-gamez"
+  IS_PROD: true
